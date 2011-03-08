@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Zeitsheet</title>
+<!-- styles -->
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.2r1/build/reset/reset-min.css">
+<style type="text/css">
+  html{background-color:#222;}
+  body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;}
+  a{color:#068ad2;}
+  .result_item{padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid #ccc;}
+  .result_item:last-child{border-bottom:0px;}
+  #results{background-color:#efefef;padding:10px;border-bottom:5px solid #ddd;width:400px;}
+  #results h3{font-size:20px;line-height:30px;font-weight:bold;color:#444;}
+  #results p.snippet{font-size:25px;padding:5px 5px 5px 0px;color:#fff;}
+  #results p.snippet span{font-weight:bold;color:#ccc;text-shadow:1px 1px 0 #999;}
+  #results p.snippet.in{background-color:#67B2A6;}
+  #results p.snippet.out{background-color:#FF342F;}
+  #results p.snippet.neither{background-color:#ddd;}
+  #results p.snippet.space{margin-bottom:5px;}
+  #results p.snippet.in span,#results p.snippet.out span,#results p.snippet.neither span{color:#fff;text-shadow:none;padding-left:5px;}
+</style>
+<!-- scripts -->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+<script type="text/javascript" src="date.js"></script>
+
+<!-- core code -->
+<script type="text/javascript">  
+
+$(function(){
+  
+  function getRandomNumber(range)
+  {
+  	return Math.floor(Math.random() * range);
+  }
+
+  function getRandomChar()
+  {
+  	var chars = "0123456789abcdefghijklmnopqurstuvwxyzABCDEFGHIJKLMNOPQURSTUVWXYZ";
+  	return chars.substr( getRandomNumber(62), 1 );
+  }
+
+  function randomID(size)
+  {
+  	var str = "";
+  	for(var i = 0; i < size; i++)
+  	{
+  		str += getRandomChar();
+  	}
+  	return str;
+  }
+  
+  // mac addresses we want to pay attention to
+  var namedMac = { 
+    '58:b0:35:6a:60:b0':'Eric Steil',
+    '58:55:ca:f2:da:4f':'Mykel Nahorniak',
+    'f8:1e:df:de:e6:d0':'Kelsey Tracey'
+  };
+  
+  // objects for actually storing the unique mac addy in/out dates/times
+  var timeData = {};
+      
+  // path to the json we're pulling
+  var logUrl = "http://purplebox.ericiii.net/localist-timecapsule-json.php?callback=?";
+  
+  // query function
+  function tt_query() {
+      
+    // performing query and displaying results
+    $.getJSON(logUrl, function(data) {
+      $.each(data, function(i,item) {
+                
+        // skip this entry if we're ignoring the mac
+        if(!namedMac[item.mac]) {
+          return;
+        }
+        
+        // initialize the mac entry if we haven't seen this mac before
+        if(!timeData[item.mac]) {
+          timeData[item.mac] = {};
+        }
+        
+        // get the start/stop dates
+        var assoc_date = item.assoc ? new Date(item.assoc) : null;
+        var disassoc_date = item.disassoc ? new Date(item.disassoc) : null;
+        
+        // skip this entry if we don't at least have one date out of this. shouldn't ever happen.
+        if(!assoc_date && !disassoc_date) {
+          return;
+        }
+        
+        // get a key to use as a string
+        var date_key = (assoc_date || disassoc_date).toString('yyyy-MM-dd');
+
+        // initialize the date storage object for this mac/date pair if necessary
+        if(!(date_key in timeData[item.mac])) {
+          timeData[item.mac][date_key] = {start: null, stop: null};
+        }
+
+        // update the start/stop date time if necessary
+        var mac_time_data = timeData[item.mac][date_key];
+        
+        // if START time found is before the one in the object, update the object
+        if(!mac_time_data.start || (Number(assoc_date) < Number(mac_time_data.start))) {
+          mac_time_data.start = assoc_date;
+        }        
+        
+        // if the STOP time found is after the one in the object, update the object
+        if(!mac_time_data.stop || (Number(disassoc_date) > Number(mac_time_data.stop))) {
+          mac_time_data.stop = disassoc_date;
+        }
+      }); // each item
+      
+      console.log('time data', timeData);
+
+      $.each(timeData, function(key,value) {
+        // get display name for each item in the object
+        var personName = namedMac[key];
+        var tempId = randomID(10);
+        
+        // adding a 'results item wrapper' to the page
+        $("#tt").append('<div class="result_item" id="ttresult_' + tempId + '"></div>');
+        
+        // adding a title to the item, parsing name from namedMac
+        $("#ttresult_" + tempId).append('<h3>' + personName + '</h3>');
+        
+        
+        // another each to loop over every date for the object
+        $.each(value, function(date,times){          
+          
+          // showing the clock in date
+          $("#ttresult_" + tempId).append('<p class="snippet"><span>' + date + '</span></p>');
+          
+
+
+          if(times.start) {
+            // showing the clock in date
+            $("#ttresult_" + tempId).append('<p class="snippet in space"><span>IN&laquo; </span>' + times.start.toString('h:mm tt')  + '</p>');
+          } else {
+            $("#ttresult_" + tempId).append('<p class="snippet neither space"><span>Not sure</span></p>');
+          }
+
+          if(times.stop) {
+            // showing the clock out date
+            $("#ttresult_" + tempId).append('<p class="snippet out"><span>OUT&raquo; </span>' + times.stop.toString('h:mm tt')  + '</p>');
+          } else {
+            $("#ttresult_" + tempId).append('<p class="snippet neither"><span>Still in the office</span></p>');
+          }
+        }); // each date
+      }); // each timeData
+
+      
+      // hiding the 'grabbing log' message
+      $("#tt_h").hide();
+      
+      // showing the results
+      $("#tt").show();
+    });
+  }
+
+  // running and presenting
+  tt_query();
+
+});
+
+</script>
+
+</head>
+<body>  
+  <div id="results">
+  
+    <h3 id="tt_h">Grabbing log...</h3>
+    <div id="tt" style="display:none;">
+    </div>
+  </div>
+</body>
+</html>
