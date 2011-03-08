@@ -29,6 +29,29 @@
 <script type="text/javascript">  
 
 $(function(){
+  /*
+  ////////////////////////////////////////
+  ////////////////////////////////////////
+  ////////////////////////////////////////
+  BEGIN CONFIG
+  */
+  
+  
+  // mac addresses we want to pay attention to
+  var namedMac = { 
+    'XX:XX:XX:XX:XX:XX':'Johnny Mnemonic'
+  };
+  
+  // path to the json we're pulling
+  var logUrl = "http://path/to/json/url";
+  
+  /*
+  ////////////////////////////////////////
+  ////////////////////////////////////////
+  ////////////////////////////////////////
+  END CONFIG
+  */
+
   
   function getRandomNumber(range)
   {
@@ -51,18 +74,8 @@ $(function(){
   	return str;
   }
   
-  // mac addresses we want to pay attention to
-  var namedMac = { 
-    '58:b0:35:6a:60:b0':'Eric Steil',
-    '58:55:ca:f2:da:4f':'Mykel Nahorniak',
-    'f8:1e:df:de:e6:d0':'Kelsey Tracey'
-  };
-  
   // objects for actually storing the unique mac addy in/out dates/times
   var timeData = {};
-      
-  // path to the json we're pulling
-  var logUrl = "http://purplebox.ericiii.net/localist-timecapsule-json.php?callback=?";
   
   // query function
   function tt_query() {
