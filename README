@@ -1,0 +1,9 @@
+Zeitsheet
+
+This script takes a JSONP feed of a syslog from an Apple Airport Extreme and parses it to determine the check-in/check-out dates
+of specific MAC addresses on a network.
+
+This can be useful for:
+- Tracking time of employees who are being paid hourly
+
+JSONification PHP script sold separately.
