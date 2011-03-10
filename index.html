@@ -15,11 +15,13 @@
   #results h3{font-size:20px;line-height:30px;font-weight:bold;color:#444;}
   #results p.snippet{font-size:25px;padding:5px 5px 5px 0px;color:#fff;}
   #results p.snippet span{font-weight:bold;color:#ccc;text-shadow:1px 1px 0 #999;}
-  #results p.snippet.in{background-color:#67B2A6;color:#fff;}
-  #results p.snippet.out{background-color:#FF342F;color:#fff;}
-  #results p.snippet.neither{background-color:#ddd;color:#fff;}
+  #results p.snippet.in{background-color:#67B2A6}
+  #results p.snippet.out{background-color:#FF342F}
+  #results p.snippet.neither{background-color:#ddd}
   #results p.snippet.space{margin-bottom:5px;}
   #results p.snippet.in span,#results p.snippet.out span,#results p.snippet.neither span{color:#fff;text-shadow:none;padding-left:5px;}
+  .total_time{position:absolute;left:415px;padding:20px;font-size:25px;line-height:90px;padding:0px 10px;background:#444;color:#fff;-moz-border-radius-bottomright:5px;-moz-border-radius-topright:5px;-webkit-border-bottom-right-radius:5px;-webkit-border-top-right-radius:5px;-moz-box-shadow:5px 5px 0 #333;-webkit-box-shadow:5px 5px 0 #333;box-shadow:5px 5px 0 #333;}
+
 </style>
 <!-- scripts -->
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
@@ -164,7 +166,10 @@ $(function(){
 
           
           // showing the clock in date
-          $("#ttresult_" + tempId).append('<p class="snippet"><span>' + date + '</span> ' + timeDiffDisplay + '</p>');
+          $("#ttresult_" + tempId).append('<p class="snippet"><span>' + date + '</span></p>');
+
+          $("#ttresult_" + tempId).append('<div class="total_time">' + timeDiffDisplay + '</div>');
+          
 
           if(times.start) {
             // showing the clock in date
