@@ -8,13 +8,13 @@
 <style type="text/css">
   html{background-color:#222;}
   body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;}
-  a{color:#068ad2;}
   .result_item{padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid #ccc;}
   .result_item:last-child{border-bottom:0px;}
   #results{background-color:#efefef;padding:10px;border-bottom:5px solid #ddd;width:400px;}
   #results h3{font-size:20px;line-height:30px;font-weight:bold;color:#444;}
   #results p.snippet{font-size:25px;padding:5px 5px 5px 0px;color:#fff;}
   #results p.snippet span{font-weight:bold;color:#ccc;text-shadow:1px 1px 0 #999;}
+  #results p.snippet span a{color:#ccc;text-decoration:none;}
   #results p.snippet.in{background-color:#67B2A6}
   #results p.snippet.out{background-color:#FF342F}
   #results p.snippet.neither{background-color:#ddd}
@@ -31,13 +31,13 @@
 <script type="text/javascript">  
 
 $(function(){
-  /*
-  ////////////////////////////////////////
-  ////////////////////////////////////////
-  ////////////////////////////////////////
-  BEGIN CONFIG
-  */
-  
+/*
+////////////////////////////////////////
+////////////////////////////////////////
+////////////////////////////////////////
+USER CONFIG
+////////////////////////////////////////
+*/
   
   // mac addresses we want to pay attention to
   var namedMac = { 
@@ -49,36 +49,49 @@ $(function(){
   
   // path to the json we're pulling
   var logUrl = "http://purplebox.ericiii.net/localist-timecapsule-json.php?callback=?";
-  
-  /*
-  ////////////////////////////////////////
-  ////////////////////////////////////////
-  ////////////////////////////////////////
-  END CONFIG
-  */
 
-  
-  function getRandomNumber(range)
-  {
-  	return Math.floor(Math.random() * range);
-  }
 
-  function getRandomChar()
-  {
-  	var chars = "0123456789abcdefghijklmnopqurstuvwxyzABCDEFGHIJKLMNOPQURSTUVWXYZ";
-  	return chars.substr( getRandomNumber(62), 1 );
-  }
+/*
+////////////////////////////////////////
+////////////////////////////////////////
+////////////////////////////////////////
+UTILITY FUNCTIONS
+////////////////////////////////////////
+*/
 
-  function randomID(size)
-  {
-  	var str = "";
-  	for(var i = 0; i < size; i++)
-  	{
-  		str += getRandomChar();
-  	}
-  	return str;
-  }
-  
+// minified noise generator
+(function(a){a.fn.noisy=function(b){b=a.extend({},a.fn.noisy.defaults,b);var f,c=document.createElement("canvas");if(c.getContext){c.width=c.height=b.size;for(var h=c.getContext("2d"),d=h.createImageData(c.width,c.height),i=b.intensity*Math.pow(b.size,2),j=255*b.opacity;i--;){var e=(~~(Math.random()*c.width)+~~(Math.random()*c.height)*d.width)*4,g=i%255;d.data[e]=g;d.data[e+1]=b.monochrome?g:~~(Math.random()*255);d.data[e+2]=b.monochrome?g:~~(Math.random()*255);d.data[e+3]=~~(Math.random()*j)}h.putImageData(d,
+0,0);f=c.toDataURL("image/png")}else f=b.fallback;return this.each(function(){a(this).data("original-css")==undefined&&a(this).data("original-css",a(this).css("background-image"));a(this).css("background-image","url("+f+"),"+a(this).data("original-css"))})};a.fn.noisy.defaults={intensity:0.9,size:200,opacity:0.08,fallback:"",monochrome:false}})(jQuery);
+
+// noise generating function
+function generateNoise(element,intensity,size,opacity,monochrome) {
+  element = "body";
+  $(element).noisy({
+      intensity: intensity, 
+      size: size, 
+      opacity: opacity,
+      fallback: 'fallback.png',
+      monochrome: monochrome
+  });
+};
+
+// adding noise to body
+generateNoise('body',0.9,200,0.08, true);
+
+// random id generator
+function getRandomNumber(range){return Math.floor(Math.random() * range);}
+function getRandomChar(){var chars = "0123456789abcdefghijklmnopqurstuvwxyzABCDEFGHIJKLMNOPQURSTUVWXYZ";return chars.substr( getRandomNumber(62), 1 );}
+function randomID(size){var str = "";for(var i = 0; i < size; i++){str += getRandomChar();}return str;}
+
+
+/*
+////////////////////////////////////////
+////////////////////////////////////////
+////////////////////////////////////////
+CORE CODE
+////////////////////////////////////////
+*/
+
   // objects for actually storing the unique mac addy in/out dates/times
   var timeData = {};
   
@@ -164,13 +177,13 @@ $(function(){
             timeDiffDisplay = timeDiffDisplay + ' hours';
           }
 
+          var totalTimeId = randomID(4);
           
           // showing the clock in date
-          $("#ttresult_" + tempId).append('<p class="snippet"><span>' + date + '</span></p>');
+          $("#ttresult_" + tempId).append('<p class="snippet"><span><a class="date_click" id="' + totalTimeId + '" href="#">' + date + '</a></span></p>');
 
-          $("#ttresult_" + tempId).append('<div class="total_time">' + timeDiffDisplay + '</div>');
+          $("#ttresult_" + tempId).append('<div class="total_time" id="' + totalTimeId + '">' + timeDiffDisplay + '</div>');
           
-
           if(times.start) {
             // showing the clock in date
             $("#ttresult_" + tempId).append('<p class="snippet in space"><span>IN&laquo; </span>' + times.start.toString('h:mm tt')  + '</p>');
@@ -181,7 +194,6 @@ $(function(){
           if(times.stop) {
             // showing the clock out date
             $("#ttresult_" + tempId).append('<p class="snippet out"><span>OUT&raquo; </span>' + times.stop.toString('h:mm tt')  + '</p>');
-            
           } else {
             $("#ttresult_" + tempId).append('<p class="snippet neither"><span>Still in the office</span></p>');
           }
@@ -199,6 +211,7 @@ $(function(){
 
   // running and presenting
   tt_query();
+  
 
 });
 
