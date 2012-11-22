@@ -12,7 +12,7 @@
   .result_item:last-child{border-bottom:0px;}
   #results{background-color:#efefef;padding:10px;border-bottom:5px solid #ddd;width:400px;}
   #results h3{font-size:20px;line-height:30px;font-weight:bold;color:#444;}
-  #results p.snippet{font-size:25px;padding:5px 5px 5px 0px;color:#fff;}
+  #results p.snippet{font-size:10px;padding:5px 5px 5px 0px;color:#fff;}
   #results p.snippet span{font-weight:bold;color:#ccc;text-shadow:1px 1px 0 #999;}
   #results p.snippet span a{color:#ccc;text-decoration:none;}
   #results p.snippet.in{background-color:#67B2A6}
@@ -20,7 +20,8 @@
   #results p.snippet.neither{background-color:#ddd}
   #results p.snippet.space{margin-bottom:5px;}
   #results p.snippet.in span,#results p.snippet.out span,#results p.snippet.neither span{color:#fff;text-shadow:none;padding-left:5px;}
-  .total_time{position:absolute;left:415px;padding:20px;font-size:25px;line-height:90px;padding:0px 10px;background:#444;color:#fff;-moz-border-radius-bottomright:5px;-moz-border-radius-topright:5px;-webkit-border-bottom-right-radius:5px;-webkit-border-top-right-radius:5px;-moz-box-shadow:5px 5px 0 #333;-webkit-box-shadow:5px 5px 0 #333;box-shadow:5px 5px 0 #333;}
+  .total_time{position:absolute;left:415px;padding:20px;font-size:10px;line-height:51px;padding:0px 10px;background:#444;color:#fff;-moz-border-radius-bottomright:5px;-moz-border-radius-topright:5px;-webkit-border-bottom-right-radius:5px;-webkit-border-top-right-radius:5px;-moz-box-shadow:5px 5px 0 #333;-webkit-box-shadow:5px 5px 0 #333;box-shadow:5px 5px 0 #333;}
+  .time_results{display:none;}
 
 </style>
 <!-- scripts -->
@@ -40,11 +41,10 @@ USER CONFIG
 */
   
   // mac addresses we want to pay attention to
-  var namedMac = { 
+  var namedMac = {
+    'f8:1e:df:de:e6:d0':'Kelsey Tracey',
     '58:b0:35:6a:60:b0':'Eric Steil',
     '58:55:ca:f2:da:4f':'Mykel Nahorniak',
-    'f8:1e:df:de:e6:d0':'Kelsey Tracey',
-    'b4:07:f9:e2:2e:e1':'Nate Mook'
   };
   
   // path to the json we're pulling
@@ -155,11 +155,13 @@ CORE CODE
         var tempId = randomID(10);
         
         // adding a 'results item wrapper' to the page
-        $("#tt").append('<div class="result_item" id="ttresult_' + tempId + '"></div>');
+        $("#tt").append('<div class="time_results" id="time_table_' + tempId + '"></div>');
         
         // adding a title to the item, parsing name from namedMac
-        $("#ttresult_" + tempId).append('<h3>' + personName + '</h3>');
+        $("#time_table_" + tempId).append('<h3>' + personName + '</h3>');
         
+        // adding a title to the item, parsing name from namedMac
+        $("#time_table_" + tempId).append('<div class="result_item" id="ttresult_' + tempId + '"></div>');
         
         // another each to loop over every date for the object
         $.each(value, function(date,times){          
@@ -198,6 +200,8 @@ CORE CODE
             $("#ttresult_" + tempId).append('<p class="snippet neither"><span>Still in the office</span></p>');
           }
         }); // each date
+        
+        
       }); // each timeData
 
       
